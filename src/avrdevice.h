@@ -62,6 +62,91 @@ class Hardware;
 class DumpManager;
 class AddressExtensionRegister;
 
+class Fraction {
+public:
+    typedef long long num_t;
+private:
+
+    num_t numerator, denominator;
+
+    static inline num_t gcd(num_t a, num_t b) {
+        if (a == 0 || b == 0)
+            return 1;
+
+        // see https://en.wikipedia.org/wiki/Greatest_common_divisor#Using_Euclid.27s_algorithm
+        while (a != b) {
+            if (a > b)
+                a -= b;
+            else
+                b -= a;
+        }
+        return a;
+    }
+public:
+    inline Fraction(num_t numerator, num_t denominator=1) {
+        num_t sign = 1;
+        if (numerator < 0) {
+            sign = -sign;
+            numerator = -numerator;
+        }
+        if (denominator < 0) {
+            sign = -sign;
+            denominator = -denominator;
+        }
+        num_t x = gcd(numerator, denominator);
+        this->numerator = sign*numerator/x;
+        this->denominator = denominator/x;
+    }
+
+    inline Fraction operator+ (const Fraction& f) const {
+        return Fraction(numerator*f.denominator + f.numerator*denominator, denominator*f.denominator);
+    }
+
+    inline Fraction operator- (const Fraction& f) const {
+        return Fraction(numerator*f.denominator - f.numerator*denominator, denominator*f.denominator);
+    }
+
+    inline Fraction operator* (const Fraction& f) const {
+        return Fraction(numerator*f.numerator, denominator*f.denominator);
+    }
+
+    inline Fraction operator/ (const Fraction& f) const {
+        return *this * f.Reciprocal();
+    }
+
+    inline Fraction Reciprocal() const {
+        return Fraction(denominator, numerator);
+    }
+
+    inline num_t RoundToInt() const {
+        return (numerator + denominator/2) / denominator;
+    }
+
+    inline double ToDouble() const {
+        return numerator / (double)denominator;
+    }
+
+    inline num_t GetNumerator() const {
+        return numerator;
+    }
+
+    inline num_t GetDenominator() const {
+        return denominator;
+    }
+};
+
+class NextStepGenerator {
+    Fraction accumulated_error;
+public:
+    inline NextStepGenerator() : accumulated_error(0) { }
+
+    inline SystemClockOffset Step(Fraction step_size) {
+        SystemClockOffset actual_step_size = (step_size + accumulated_error).RoundToInt();
+        accumulated_error = (step_size + accumulated_error) - actual_step_size;
+        return actual_step_size;
+    }
+};
+
 //! Basic AVR device, contains the core functionality
 class AvrDevice: public SimulationMember, public TraceValueRegister {
     
@@ -76,7 +161,8 @@ class AvrDevice: public SimulationMember, public TraceValueRegister {
         std::string devName; //!< hold the device name, which this core simulate
 
     protected:
-        SystemClockOffset clockFreq;  ///< Period of a tick (1/F_OSC) in [ns]
+        Fraction clockFreq;  ///< Period of a tick (1/F_OSC) in [ns]
+        NextStepGenerator nextStepGenerator;
         std::map < std::string, Pin *> allPins;
         std::string actualFilename;
         
@@ -161,8 +247,8 @@ class AvrDevice: public SimulationMember, public TraceValueRegister {
           single clock cycle. */
         int Step(bool &untilCoreStepFinished, SystemClockOffset *nextStepIn_ns =0);
         void Reset();
-        void SetClockFreq(SystemClockOffset f);
-        SystemClockOffset GetClockFreq();
+        void SetClockFreq(Fraction f);
+        Fraction GetClockFreq();
 
         void RegisterPin(const std::string &name, Pin *p) {
             allPins.insert(std::pair<std::string, Pin*>(name, p));

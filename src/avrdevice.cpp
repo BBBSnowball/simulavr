@@ -64,11 +64,11 @@ void AvrDevice::Load(const char* fname) {
     ELFLoad(this);
 }
 
-void AvrDevice::SetClockFreq(SystemClockOffset nanosec) {
+void AvrDevice::SetClockFreq(Fraction nanosec) {
    clockFreq = nanosec;
 }
 
-SystemClockOffset AvrDevice::GetClockFreq() {
+Fraction AvrDevice::GetClockFreq() {
     return clockFreq;
 }
 
@@ -132,6 +132,7 @@ AvrDevice::AvrDevice(unsigned int _ioSpaceSize,
     iRamSize(IRamSize),
     eRamSize(ERamSize),
     devSignature(numeric_limits<unsigned int>::max()),
+    clockFreq(0),
     abortOnInvalidAccess(false),
     coreTraceGroup(this),
     deferIrq(false),
@@ -270,7 +271,7 @@ int AvrDevice::Step(bool &untilCoreStepFinished, SystemClockOffset *nextStepIn_n
                 if(trace_on)
                     traceOut << "Breakpoint found at 0x" << hex << PC << dec << endl;
                 if(nextStepIn_ns != 0)
-                    *nextStepIn_ns=clockFreq;
+                    *nextStepIn_ns=nextStepGenerator.Step(clockFreq);
                 untilCoreStepFinished = !(cpuCycles > 0);
                 dump_manager->cycle();
                 return BREAK_POINT;
@@ -344,7 +345,7 @@ int AvrDevice::Step(bool &untilCoreStepFinished, SystemClockOffset *nextStepIn_n
     }
 
     if(nextStepIn_ns != NULL)
-        *nextStepIn_ns = clockFreq;
+        *nextStepIn_ns = nextStepGenerator.Step(clockFreq);
 
     if(trace_on == 1) {
         traceOut << endl;

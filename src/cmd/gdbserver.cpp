@@ -1428,7 +1428,8 @@ int GdbServer::Step(bool &trueHwStep, SystemClockOffset *timeToNextStepIn_ns) {
         if (!waitForGdbConnection) {
             core->Step(trueHwStep, timeToNextStepIn_ns);    //if not connected to gdb simple run it  
         } else {
-            if (timeToNextStepIn_ns!=0) *timeToNextStepIn_ns=core->GetClockFreq();
+            //TODO this is inaccurate
+            if (timeToNextStepIn_ns!=0) *timeToNextStepIn_ns=core->GetClockFreq().RoundToInt();
         }
         return 0;
     } else {
