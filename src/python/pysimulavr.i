@@ -76,6 +76,7 @@ namespace std {
 %include "pinnotify.h"
 %include "traceval.h"
 %include "irqsystem.h"
+%include "nextstep.h"
 %include "avrdevice.h"
 
 %extend DumpManager {

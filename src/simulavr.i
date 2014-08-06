@@ -55,6 +55,7 @@ namespace std {
 %include "ui/mysocket.h"
 %include "pinnotify.h"
 %include "traceval.h"
+%include "nextstep.h"
 %include "avrdevice.h"
 %include "avrfactory.h"
 %include "at8515.h"

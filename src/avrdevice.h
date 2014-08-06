@@ -32,6 +32,7 @@
 #include "net.h"
 #include "traceval.h"
 #include "flashprog.h"
+#include "nextstep.h"
 
 #include <string>
 #include <map>
@@ -62,90 +63,6 @@ class Hardware;
 class DumpManager;
 class AddressExtensionRegister;
 
-class Fraction {
-public:
-    typedef long long num_t;
-private:
-
-    num_t numerator, denominator;
-
-    static inline num_t gcd(num_t a, num_t b) {
-        if (a == 0 || b == 0)
-            return 1;
-
-        // see https://en.wikipedia.org/wiki/Greatest_common_divisor#Using_Euclid.27s_algorithm
-        while (a != b) {
-            if (a > b)
-                a -= b;
-            else
-                b -= a;
-        }
-        return a;
-    }
-public:
-    inline Fraction(num_t numerator, num_t denominator=1) {
-        num_t sign = 1;
-        if (numerator < 0) {
-            sign = -sign;
-            numerator = -numerator;
-        }
-        if (denominator < 0) {
-            sign = -sign;
-            denominator = -denominator;
-        }
-        num_t x = gcd(numerator, denominator);
-        this->numerator = sign*numerator/x;
-        this->denominator = denominator/x;
-    }
-
-    inline Fraction operator+ (const Fraction& f) const {
-        return Fraction(numerator*f.denominator + f.numerator*denominator, denominator*f.denominator);
-    }
-
-    inline Fraction operator- (const Fraction& f) const {
-        return Fraction(numerator*f.denominator - f.numerator*denominator, denominator*f.denominator);
-    }
-
-    inline Fraction operator* (const Fraction& f) const {
-        return Fraction(numerator*f.numerator, denominator*f.denominator);
-    }
-
-    inline Fraction operator/ (const Fraction& f) const {
-        return *this * f.Reciprocal();
-    }
-
-    inline Fraction Reciprocal() const {
-        return Fraction(denominator, numerator);
-    }
-
-    inline num_t RoundToInt() const {
-        return (numerator + denominator/2) / denominator;
-    }
-
-    inline double ToDouble() const {
-        return numerator / (double)denominator;
-    }
-
-    inline num_t GetNumerator() const {
-        return numerator;
-    }
-
-    inline num_t GetDenominator() const {
-        return denominator;
-    }
-};
-
-class NextStepGenerator {
-    Fraction accumulated_error;
-public:
-    inline NextStepGenerator() : accumulated_error(0) { }
-
-    inline SystemClockOffset Step(Fraction step_size) {
-        SystemClockOffset actual_step_size = (step_size + accumulated_error).RoundToInt();
-        accumulated_error = (step_size + accumulated_error) - actual_step_size;
-        return actual_step_size;
-    }
-};
 
 //! Basic AVR device, contains the core functionality
 class AvrDevice: public SimulationMember, public TraceValueRegister {

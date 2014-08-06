@@ -75,7 +75,7 @@ libsim_la_SOURCES = \
   hwtimer/timerirq.cpp hwpinchange.cpp hwport.cpp hwspi.cpp hwsreg.cpp \
   hwtimer/icapturesrc.cpp hwstack.cpp hwtimer/hwtimer.cpp hwuart.cpp hwwado.cpp \
   ioregs.cpp irqsystem.cpp ui/keyboard.cpp ui/lcd.cpp memory.cpp \
-  ui/mysocket.cpp net.cpp pin.cpp ui/extpin.cpp pinatport.cpp pinmon.cpp \
+  ui/mysocket.cpp net.cpp nextstep.cpp pin.cpp ui/extpin.cpp pinatport.cpp pinmon.cpp \
   rwmem.cpp ui/scope.cpp ui/serialrx.cpp ui/serialtx.cpp spisrc.cpp spisink.cpp \
   specialmem.cpp string2.cpp systemclock.cpp traceval.cpp ui/ui.cpp 
 
@@ -94,7 +94,7 @@ pkginclude_HEADERS = \
   string2.h decoder.h externaltype.h flash.h flashprog.h hwdecls.h \
   funktor.h hwacomp.h hwad.h hweeprom.h string2_template.h hwpinchange.h \
   hwport.h hwspi.h hwsreg.h hwstack.h hwuart.h hwwado.h ioregs.h irqsystem.h \
-  memory.h net.h pin.h pinatport.h pinnotify.h pinmon.h printable.h rwmem.h \
+  memory.h net.h nextstep.h pin.h pinatport.h pinnotify.h pinmon.h printable.h rwmem.h \
   simulationmember.h spisrc.h spisink.h specialmem.h systemclock.h \
   systemclocktypes.h traceval.h types.h avrsignature.h avrreadelf.h \
   elfio/elfio/elf_types.hpp elfio/elfio/elfio.hpp elfio/elfio/elfio_dump.hpp \
@@ -126,7 +126,7 @@ install-vpi:
 endif
 
 TCLHEADER = avrdevice.h at8515.h atmega128.h at4433.h cmd/gdb.h hardware.h \
-    ui/keyboard.h ui/lcd.h net.h pin.h ui/extpin.h ui/keyboard.h rwmem.h \
+    ui/keyboard.h ui/lcd.h net.h nextstep.h pin.h ui/extpin.h ui/keyboard.h rwmem.h \
     ui/scope.h ui/serialrx.h ui/serialtx.h systemclock.h systemclocktypes.h \
     ui/ui.h
 
