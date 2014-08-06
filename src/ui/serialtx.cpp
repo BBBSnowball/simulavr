@@ -30,9 +30,10 @@
 
 using namespace std;
 
-SerialTxBuffered::SerialTxBuffered()
+SerialTxBuffered::SerialTxBuffered(bool verbose)
 {
     allPins["tx"] = &tx;
+    this->verbose = verbose;
     Reset();
 }
 
@@ -107,7 +108,9 @@ void SerialTxBuffered::Send(unsigned char data)
 {
     inputBuffer.push_back(data); //write new char to input buffer
 
-    cerr << "TX: " << hex << data << " ";
+    if (verbose)
+        cerr << "TX: " << hex << data << " ";
+
     //if we not active, activate tx machine now
     if (txState==TX_DISABLED) {
         txState=TX_SEND_STARTBIT;
