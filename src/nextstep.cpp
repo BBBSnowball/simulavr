@@ -60,6 +60,10 @@ Fraction::Fraction(num_t numerator, num_t denominator) {
 }
 
 SystemClockOffset NextStepGenerator::Step(Fraction step_size) {
+    // shortcut for trivial case
+    if (step_size.GetDenominator() == 1)
+        return step_size.GetNumerator();
+
     SystemClockOffset actual_step_size = (step_size + accumulated_error).RoundToInt();
     accumulated_error = (step_size + accumulated_error) - actual_step_size;
     return actual_step_size;
