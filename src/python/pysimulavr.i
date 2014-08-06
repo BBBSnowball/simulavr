@@ -31,6 +31,14 @@
   #include "attiny2313.h"
   #include "attiny25_45_85.h"
   
+  // hardware simulation
+  #include "ui/serialtx.h"
+  #include "ui/serialrx.h"
+
+  // debugging and tracing
+  #include "cmd/gdb.h"
+  #include "avrerror.h"
+
 %}
 
 %include "std_vector.i"
@@ -51,6 +59,10 @@ namespace std {
   } catch(int i) {
     PyErr_Format(PyExc_RuntimeError, "%d", i);
     return NULL;
+  } catch (Swig::DirectorException &e) {
+    //TODO wrap in Python exception
+    std::cerr << "Error in Python code (DirectorException): " << e.getMessage() << std::endl;
+    SWIG_fail;
   }
 }
 
@@ -74,6 +86,15 @@ namespace std {
                   const bool wstrobe) {
     DumpVCD *d = new DumpVCD(vcdname, timebase, rstrobe, wstrobe);
     $self->addDumper(d, $self->load(istr));
+  }
+}
+
+%extend Fraction {
+  std::string __str__() {
+    std::ostringstream s;
+    s << $self->GetNumerator() << "/" << $self->GetDenominator()
+      << " (" << ($self->GetNumerator()/(double)$self->GetDenominator()) << ")";
+    return s.str();
   }
 }
 
@@ -164,5 +185,17 @@ namespace std {
 %include "atmega16_32.h"
 %include "attiny2313.h"
 %include "attiny25_45_85.h"
+
+// hardware simulation
+%feature("director") SerialRxBasic;
+%feature("nodirector") SerialRxBasic::GetPin;
+%feature("director") SerialRxBuffered;
+%feature("nodirector") SerialRxBuffered::GetPin;
+%include "ui/serialtx.h"
+%include "ui/serialrx.h"
+
+// debugging
+%include "cmd/gdb.h"
+%include "avrerror.h"
 
 // EOF
