@@ -27,16 +27,20 @@
 
 
 Fraction::num_t Fraction::gcd(num_t a, num_t b) {
-    if (a == 0 || b == 0)
-        return 1;
-
     // see https://en.wikipedia.org/wiki/Greatest_common_divisor#Using_Euclid.27s_algorithm
-    while (a != b) {
-        if (a > b)
-            a -= b;
-        else
-            b -= a;
+
+    if (b > a) {
+    	num_t tmp = a;
+    	a = b;
+    	b = tmp;
     }
+
+    while (b > 0) {
+    	num_t c = a % b;
+    	a = b;
+    	b = c;
+    }
+
     return a;
 }
 
