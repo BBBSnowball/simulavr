@@ -51,6 +51,11 @@ namespace std {
    %template(DWordVector) vector<dword>;
 };
 
+%init %{
+  // throw exceptions instead of aborting the process
+  sysConHandler.SetUseExit(false);
+%}
+
 %exception {
   try {
     $action
@@ -61,9 +66,8 @@ namespace std {
     PyErr_Format(PyExc_RuntimeError, "%d", i);
     return NULL;
   } catch (Swig::DirectorException &e) {
-    //TODO wrap in Python exception
-    std::cerr << "Error in Python code (DirectorException): " << e.getMessage() << std::endl;
-    SWIG_fail;
+    PyErr_Format(PyExc_RuntimeError, "Error in Python code (DirectorException): %s", e.getMessage());
+    return NULL;
   }
 }
 
