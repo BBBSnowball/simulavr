@@ -8,6 +8,9 @@ class SimulavrAdapter(object):
   def __init__(self, clock_period_ns = DEFAULT_CLOCK_SETTING):
     self.__clock_period_ns = clock_period_ns
 
+    # throw exceptions instead of aborting the process
+    pysimulavr.cvar.sysConHandler.SetUseExit(False)
+
   system_clock = property(lambda self: self.__sc)
   
   def loadDevice(self, t, e, enable_gdb=False):
