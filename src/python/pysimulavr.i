@@ -38,6 +38,7 @@
   // debugging and tracing
   #include "cmd/gdb.h"
   #include "avrerror.h"
+  #include "specialmem.h"
 
 %}
 
@@ -225,5 +226,16 @@ namespace std {
 // debugging
 %include "cmd/gdb.h"
 %include "avrerror.h"
+%include "specialmem.h"
+
+%extend RWFifo {
+  std::string getInput() const {
+    return std::string((const char*)$self->getInputData(), $self->getInputLength());
+  }
+
+  void appendOutput(std::string s) {
+    $self->appendOutput((const uint8_t*)s.c_str(), s.size());
+  }
+}
 
 // EOF

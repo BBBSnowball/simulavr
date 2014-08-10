@@ -30,6 +30,7 @@
 #define SPECIALMEM
 
 #include <fstream>
+#include <vector>
 #include "rwmem.h"
 
 //! FIFO write memory
@@ -68,6 +69,31 @@ class RWReadFromFile: public RWMemoryMember {
 
     std::istream &is;
     mutable std::ifstream ifs;
+};
+
+//! FIFO read and write memory
+/*! Memory register which will fulfill all reads with
+  a byte drawn from a buffer and redirect all write
+  accesses to a different buffer. The input and output
+  format is binary. As no user interface is provided,
+  this class is only useful for tests. */
+class RWFifo: public RWMemoryMember {
+ public:
+    RWFifo(TraceValueRegister *registry,
+           const std::string &tracename);
+
+    const uint8_t* getInputData()   const;
+    const size_t   getInputLength() const;
+    void skipInput(size_t amount);
+    void appendOutput(const uint8_t* data, size_t length);
+    const size_t getUnprocessedOutputLength() const;
+ protected:
+    unsigned char get() const;
+    void set(unsigned char);
+
+    std::vector<uint8_t> input_buffer;
+    mutable std::vector<uint8_t> output_buffer;
+    mutable bool readEmptyWarningFirstTime;
 };
 
 //! exit() on access memory

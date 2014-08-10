@@ -68,7 +68,49 @@ unsigned char RWReadFromFile::get() const {
     char val;
     is.get(val);
     return val; 
-} 
+}
+
+
+RWFifo::RWFifo(TraceValueRegister *registry,
+               const std::string &tracename) :
+    RWMemoryMember(registry, tracename),
+    readEmptyWarningFirstTime(true) {}
+
+const uint8_t* RWFifo::getInputData()   const { return &input_buffer.front(); }
+
+const size_t   RWFifo::getInputLength() const { return input_buffer.size(); }
+
+void RWFifo::skipInput(size_t amount) {
+  if (amount > input_buffer.size())
+    amount = input_buffer.size();
+  input_buffer.erase(input_buffer.begin(), input_buffer.begin()+amount);
+}
+
+void RWFifo::appendOutput(const uint8_t* data, size_t length) {
+  for (size_t i=0; i<length; i++) {
+    output_buffer.push_back(data[i]);
+  }
+}
+
+const size_t RWFifo::getUnprocessedOutputLength() const { return output_buffer.size(); }
+
+unsigned char RWFifo::get() const {
+    if (!output_buffer.empty()) {
+        uint8_t value = output_buffer.front();
+        output_buffer.erase(output_buffer.begin());
+        return value;
+    } else {
+        if (readEmptyWarningFirstTime) {
+            avr_message("The AVR program is reading from an empty RWFifo. This warning won't be reported again.");
+            readEmptyWarningFirstTime = false;
+        }
+        return (uint8_t)(-1);
+    }
+}
+
+void RWFifo::set(unsigned char c) {
+    input_buffer.push_back(c);
+}
 
 
 RWExit::RWExit(TraceValueRegister *registry,
