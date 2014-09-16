@@ -80,7 +80,8 @@ class RWReadFromFile: public RWMemoryMember {
 class RWFifo: public RWMemoryMember {
  public:
     RWFifo(TraceValueRegister *registry,
-           const std::string &tracename);
+           const std::string &tracename,
+           bool verbose = false);
 
     const uint8_t* getInputData()   const;
     const size_t   getInputLength() const;
@@ -94,6 +95,7 @@ class RWFifo: public RWMemoryMember {
     std::vector<uint8_t> input_buffer;
     mutable std::vector<uint8_t> output_buffer;
     mutable bool readEmptyWarningFirstTime;
+    bool verbose;
 };
 
 //! exit() on access memory

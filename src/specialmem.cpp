@@ -72,9 +72,12 @@ unsigned char RWReadFromFile::get() const {
 
 
 RWFifo::RWFifo(TraceValueRegister *registry,
-               const std::string &tracename) :
+               const std::string &tracename,
+               bool verbose) :
     RWMemoryMember(registry, tracename),
-    readEmptyWarningFirstTime(true) {}
+    readEmptyWarningFirstTime(true),
+    verbose(verbose) {
+}
 
 const uint8_t* RWFifo::getInputData()   const { return &input_buffer.front(); }
 
@@ -110,6 +113,10 @@ unsigned char RWFifo::get() const {
 
 void RWFifo::set(unsigned char c) {
     input_buffer.push_back(c);
+
+    if (verbose) {
+        avr_message("%s: '%c' (%d)", tracename.c_str(), c, c);
+    }
 }
 
 
