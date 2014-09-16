@@ -217,13 +217,15 @@ namespace std {
 %feature("director") SerialRxBasic;
 %feature("nodirector") SerialRxBasic::GetPin;
 %feature("nodirector") SerialRxBasic::PinStateHasChanged;
-%feature("nodirector") SerialRxBasic::GetPin;
 %feature("nodirector") SerialRxBasic::Step;
 %feature("director") SerialRxBuffered;
 %feature("nodirector") SerialRxBuffered::GetPin;
 %feature("nodirector") SerialRxBuffered::PinStateHasChanged;
-%feature("nodirector") SerialRxBuffered::GetPin;
 %feature("nodirector") SerialRxBuffered::Step;
+%feature("director") SerialTxBuffered;
+%feature("nodirector") SerialTxBuffered::GetPin;
+%feature("nodirector") SerialTxBuffered::SetBaudRate;
+%feature("nodirector") SerialTxBuffered::Send;
 %include "ui/serialtx.h"
 %include "ui/serialrx.h"
 
